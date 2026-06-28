@@ -53,6 +53,8 @@ const RULES: MuscleRule[] = [
       'military press',
       'lateral raise',
       'front raise',
+      'rear delt',
+      'delt',
       'shrug',
       'arnold',
     ],
