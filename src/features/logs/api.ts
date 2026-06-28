@@ -1,5 +1,7 @@
 import { db } from '@/db/db'
-import type { EventLog } from '@/db/types'
+import type { EventLog, StructuredEvent } from '@/db/types'
+import { muscleGroupsFor } from '@/features/structure/muscleGroups'
+import { estimateVolumeKg } from '@/features/structure/sets'
 import { newId } from '@/lib/id'
 
 /**
@@ -45,6 +47,29 @@ export async function updateLog(id: string, patch: LogPatch): Promise<void> {
     changes.modelId = undefined
   }
   await db.logs.update(id, changes)
+}
+
+/**
+ * Persist hand-edited structured events (e.g. after adjusting individual sets).
+ * Muscle groups and volume are re-derived so insights stay consistent, and the
+ * status stays `structured` so the background parser leaves these edits alone —
+ * unlike a raw-text edit, which resets to `raw` and re-parses from scratch.
+ */
+export async function updateLogStructured(
+  id: string,
+  structured: StructuredEvent[],
+): Promise<void> {
+  const cleaned = structured.map((event) => {
+    if (event.kind !== 'workout') return event
+    const muscleGroups = muscleGroupsFor(event.exercise)
+    const volume = event.sets ? estimateVolumeKg(event.sets) : undefined
+    return {
+      ...event,
+      muscleGroups: muscleGroups.length ? muscleGroups : undefined,
+      estimatedVolumeKg: volume,
+    }
+  })
+  await db.logs.update(id, { structured: cleaned, status: 'structured', updatedAt: Date.now() })
 }
 
 export async function deleteLog(id: string): Promise<void> {

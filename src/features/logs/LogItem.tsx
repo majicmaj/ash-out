@@ -1,27 +1,30 @@
 import { useState } from 'react'
 import type { EventLog } from '@/db/types'
 import { Button } from '@/components/Button'
-import { Textarea } from '@/components/Textarea'
 import { PencilIcon, TrashIcon, CheckIcon, XIcon } from '@/components/icons'
 import { formatTime } from '@/lib/date'
 import { LogSummaryChips } from '@/features/structure/LogSummaryChips'
-import { deleteLog, updateLog } from './api'
+import { LogStructuredView } from './LogStructuredView'
+import { LogEditor } from './LogEditor'
+import { deleteLog } from './api'
 
 interface LogItemProps {
   log: EventLog
 }
 
 /**
- * One journal entry. Read mode shows the time and the text verbatim; the
- * controls reveal on hover/focus to keep the timeline calm. Editing and
- * deleting are inline so the user never leaves the journal.
+ * One journal entry. Read mode shows the time and a clean parsed view (falling
+ * back to the raw text until structuring runs); editing happens inline via the
+ * structured editor. Controls reveal on hover/focus to keep the timeline calm.
  */
 export function LogItem({ log }: LogItemProps) {
   const [mode, setMode] = useState<'view' | 'edit' | 'confirm-delete'>('view')
 
   if (mode === 'edit') {
-    return <EditRow log={log} onDone={() => setMode('view')} />
+    return <LogEditor log={log} onDone={() => setMode('view')} />
   }
+
+  const structured = log.status === 'structured' ? log.structured : undefined
 
   return (
     <li className="group flex gap-3 rounded-xl px-3 py-2.5 hover:bg-slate-900/70">
@@ -33,9 +36,13 @@ export function LogItem({ log }: LogItemProps) {
       </time>
 
       <div className="min-w-0 flex-1">
-        <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-slate-200">
-          {log.rawText}
-        </p>
+        {structured && structured.length > 0 ? (
+          <LogStructuredView structured={structured} />
+        ) : (
+          <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-slate-200">
+            {log.rawText}
+          </p>
+        )}
         <LogSummaryChips log={log} />
       </div>
 
@@ -74,48 +81,6 @@ export function LogItem({ log }: LogItemProps) {
           </Button>
         </div>
       )}
-    </li>
-  )
-}
-
-interface EditRowProps {
-  log: EventLog
-  onDone: () => void
-}
-
-function EditRow({ log, onDone }: EditRowProps) {
-  const [text, setText] = useState(log.rawText)
-
-  async function save() {
-    const trimmed = text.trim()
-    if (trimmed && trimmed !== log.rawText) await updateLog(log.id, { rawText: trimmed })
-    onDone()
-  }
-
-  return (
-    <li className="rounded-xl border border-slate-700 bg-slate-900 px-3 py-2.5">
-      <Textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        autoFocus
-        aria-label="Edit entry text"
-        className="text-[15px] leading-relaxed"
-        onKeyDown={(e) => {
-          if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
-            e.preventDefault()
-            void save()
-          }
-          if (e.key === 'Escape') onDone()
-        }}
-      />
-      <div className="mt-2 flex justify-end gap-1">
-        <Button size="sm" variant="ghost" onClick={onDone}>
-          Cancel
-        </Button>
-        <Button size="sm" onClick={() => void save()} disabled={!text.trim()}>
-          Save
-        </Button>
-      </div>
     </li>
   )
 }

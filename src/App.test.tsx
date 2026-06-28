@@ -19,7 +19,8 @@ describe('App — logging flow', () => {
     await user.type(screen.getByLabelText(/new log entry/i), 'bench press 3x8 at 60kg')
     await user.click(screen.getByRole('button', { name: /log it/i }))
 
-    expect(await screen.findByText('bench press 3x8 at 60kg')).toBeInTheDocument()
+    // The journal shows the parsed exercise once structuring runs.
+    expect(await screen.findByText('bench press')).toBeInTheDocument()
     expect(screen.queryByText(/start your journal/i)).not.toBeInTheDocument()
   })
 
@@ -34,26 +35,43 @@ describe('App — logging flow', () => {
     await waitFor(() => expect(input.value).toBe(''))
   })
 
-  it('edits an existing entry', async () => {
+  it('edits an individual set on a past entry', async () => {
     const user = userEvent.setup()
     renderApp()
 
-    await user.type(screen.getByLabelText(/new log entry/i), 'sqats 5x5')
+    await user.type(screen.getByLabelText(/new log entry/i), 'bench press 3x8 at 60kg')
     await user.click(screen.getByRole('button', { name: /log it/i }))
-    const entry = await screen.findByText('sqats 5x5')
 
-    // Entering edit mode replaces the <li>, so re-query from screen rather than
-    // holding the original (now detached) row element.
-    await user.click(within(entry.closest('li')!).getByRole('button', { name: /edit entry/i }))
+    // Wait for structuring, then enter the structured editor.
+    const exercise = await screen.findByText('bench press')
+    await user.click(within(exercise.closest('li')!).getByRole('button', { name: /edit entry/i }))
 
-    // Set the value atomically — per-character typing can drop a keystroke
-    // under CPU load and is irrelevant to what we're verifying here (the edit
-    // persists and re-renders).
-    const editor = await screen.findByLabelText(/edit entry text/i)
-    fireEvent.change(editor, { target: { value: 'squats 5x5' } })
+    // Adjust the first set's reps — each set is its own editable row.
+    const reps = await screen.findByLabelText(/set 1 reps/i)
+    fireEvent.change(reps, { target: { value: '10' } })
     await user.click(screen.getByRole('button', { name: /^save$/i }))
 
-    expect(await screen.findByText('squats 5x5')).toBeInTheDocument()
+    expect(await screen.findByText('10×60')).toBeInTheDocument()
+  })
+
+  it('deletes an extra set on a past entry', async () => {
+    const user = userEvent.setup()
+    renderApp()
+
+    await user.type(screen.getByLabelText(/new log entry/i), 'bench press 3x8 at 60kg')
+    await user.click(screen.getByRole('button', { name: /log it/i }))
+
+    const exercise = await screen.findByText('bench press')
+    await user.click(within(exercise.closest('li')!).getByRole('button', { name: /edit entry/i }))
+
+    // Three sets to start; delete one and save.
+    expect(await screen.findByLabelText(/set 3 reps/i)).toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: /delete set 3/i }))
+    await user.click(screen.getByRole('button', { name: /^save$/i }))
+
+    await waitFor(() =>
+      expect(screen.getAllByText('8×60').length).toBe(2),
+    )
   })
 
   it('deletes an entry after confirmation', async () => {

@@ -1,4 +1,4 @@
-import type { MuscleGroup, StructuredEvent } from '@/db/types'
+import type { ExerciseSet, MuscleGroup, StructuredEvent } from '@/db/types'
 
 /**
  * Derive compact, display-ready chips for a log from its structured events.
@@ -39,6 +39,26 @@ export function summarizeLog(structured: StructuredEvent[] | undefined): LogSumm
 
 function formatNumber(n: number): string {
   return n.toLocaleString()
+}
+
+/** Drop a trailing ".0" so weights read "100" not "100.0", but keep "3.6". */
+function formatWeight(kg: number): string {
+  return String(Number(kg.toFixed(1)))
+}
+
+/** One set as a compact label: "3×100", "8 reps", "60 kg", or a cardio metric. */
+export function formatSet(set: ExerciseSet): string {
+  if (set.distanceM || set.durationSec) {
+    const parts: string[] = []
+    if (set.distanceM) parts.push(formatDistance(set.distanceM))
+    if (set.durationSec) parts.push(formatDuration(set.durationSec))
+    return parts.join(' · ')
+  }
+  if (set.reps !== undefined && set.weightKg !== undefined)
+    return `${set.reps}×${formatWeight(set.weightKg)}`
+  if (set.reps !== undefined) return `${set.reps} reps`
+  if (set.weightKg !== undefined) return `${formatWeight(set.weightKg)} kg`
+  return '—'
 }
 
 export function formatDistance(metres: number): string {
