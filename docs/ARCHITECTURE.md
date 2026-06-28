@@ -17,6 +17,7 @@ components/  reusable, presentational UI primitives (Button, Modal, Textarea, ic
 features/    vertical slices — each owns its api (writes), hooks (live reads), and views
   logs/        capture + journal (step 1)
   structure/   pluggable structuring engines + insight chips (step 2)
+  insights/    pure aggregation + insights view + leaderboard (steps 3-4)
   data/        export / import / clear
 db/          Dexie instance + the EventLog data model
 lib/         framework-free helpers (date, id, cn, file)

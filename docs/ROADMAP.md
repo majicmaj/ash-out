@@ -27,21 +27,23 @@ Turn each clause of a raw log into structured events (workout / meal / note).
 
 Next here: re-structure existing entries when AI is enabled; per-event editing.
 
-## Step 3 — Insights
+## Step 3 — Insights ✅
 
 Aggregate structured events into trends.
 
-- Per-period rollups: training volume, sessions, calories/macros, PRs.
-- Pure, testable aggregation functions over the structured store.
-- Lightweight charts; all computed on-device from local data.
+- Pure aggregation over the structured store (`computeInsights`): workout days,
+  total sets, volume, cardio distance/duration, meals — for a rolling window.
+- Insights tab with a 7-day / 30-day / all-time selector and stat cards.
+- Next: macros rollup once the LLM fills them; PRs; activity sparkline.
 
-## Step 4 — Muscle-group leaderboard
+## Step 4 — Muscle-group leaderboard ✅
 
 Rank muscle groups by contribution over a time window.
 
-- Sum estimated volume per `MuscleGroup`; rank and visualize.
-- Time filters (week / month / all-time); highlight neglected groups.
-- Optional, later: opt-in sharing/compare — still local-first by default.
+- Ranks groups by **sets per muscle group** (the standard hypertrophy volume
+  metric), anchored to the recommended ≈10–20 sets/week; bars turn green on
+  target. Cardio summarized separately.
+- Next: highlight neglected groups; opt-in compare — still local-first.
 
 ## Cross-cutting
 

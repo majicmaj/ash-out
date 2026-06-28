@@ -6,9 +6,8 @@ Write down what you did in plain words — _"bench press 3x8 at 60kg, then a 5k 
 and Ashout keeps it. No accounts, no server, no network required. It's an installable
 PWA, so it works offline and feels like a native app.
 
-> **Status: Steps 1–2 are built and tested.** Capture works, and entries are
-> auto-structured on-device. Insights and leaderboards are next — see
-> [`docs/ROADMAP.md`](docs/ROADMAP.md).
+> **Status: all four steps are built and tested**, end to end and fully
+> on-device. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's polished next.
 
 ## The four steps
 
@@ -16,11 +15,12 @@ PWA, so it works offline and feels like a native app.
 2. **Structure** — entries are parsed into workouts/meals on-device: a free
    instant heuristic parser by default, with an optional **WebLLM** (WebGPU)
    model for richer extraction. _(done)_
-3. **Insights** — aggregate the structured data into trends and summaries.
-4. **Leaderboards** — rank muscle groups by volume over time.
+3. **Insights** — aggregate the structured data into trends (workout days, sets,
+   volume, distance, time) over a rolling window. _(done)_
+4. **Leaderboard** — rank muscle groups by weekly sets, against the recommended
+   training-volume target. _(done)_
 
-Everything stays on-device — no backend. The structured data already carries the
-muscle-group and volume fields that steps 3–4 will aggregate.
+Everything stays on-device — no backend, no accounts.
 
 ## Tech
 
@@ -73,6 +73,7 @@ src/
   features/
     logs/        capture, journal, edit/delete (step 1)
     structure/   structuring engines (heuristic + WebLLM) + insight chips (step 2)
+    insights/    aggregation + insights view + muscle leaderboard (steps 3-4)
     data/        export / import / clear
   components/    reusable UI primitives
   lib/           tiny framework-free helpers (dates, ids, files)

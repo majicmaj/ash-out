@@ -32,6 +32,11 @@ for (const text of entries) {
 }
 await page.screenshot({ path: `${outDir}/2-journal.png` })
 
+await page.getByRole('tab', { name: /insights/i }).click()
+await page.waitForSelector('text=Muscle group leaderboard')
+await page.screenshot({ path: `${outDir}/4-insights.png` })
+await page.getByRole('tab', { name: /journal/i }).click()
+
 await page.getByRole('button', { name: /data & settings/i }).click()
 await page.waitForSelector('text=Data & settings')
 await page.screenshot({ path: `${outDir}/3-settings.png` })

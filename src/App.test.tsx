@@ -82,4 +82,19 @@ describe('App — logging flow', () => {
     expect(await screen.findByText('chest')).toBeInTheDocument()
     expect(await screen.findByText(/kg volume/i)).toBeInTheDocument()
   })
+
+  it('shows aggregated insights and the muscle leaderboard', async () => {
+    const user = userEvent.setup()
+    renderApp()
+
+    await user.type(screen.getByLabelText(/new log entry/i), 'bench press 3x8 at 60kg')
+    await user.click(screen.getByRole('button', { name: /log it/i }))
+    await screen.findByText('chest') // wait for structuring
+
+    await user.click(screen.getByRole('tab', { name: /insights/i }))
+
+    expect(await screen.findByText(/muscle group leaderboard/i)).toBeInTheDocument()
+    expect(screen.getByText('Total sets')).toBeInTheDocument()
+    expect(screen.getByText('Workout days')).toBeInTheDocument()
+  })
 })

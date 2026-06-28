@@ -36,6 +36,17 @@ test.describe('Ashout logging', () => {
     await expect(row.getByText(/kg volume/i)).toBeVisible()
   })
 
+  test('aggregates insights and ranks muscle groups', async ({ page }) => {
+    await page.goto('/')
+    await log(page, 'bench press 3x8 at 60kg')
+    await expect(entry(page, 'bench press 3x8 at 60kg').getByText('chest')).toBeVisible()
+
+    await page.getByRole('tab', { name: /insights/i }).click()
+    await expect(page.getByText(/muscle group leaderboard/i)).toBeVisible()
+    await expect(page.getByText('Total sets')).toBeVisible()
+    await expect(page.getByText('chest')).toBeVisible()
+  })
+
   test('persists entries across a reload (on-device storage)', async ({ page }) => {
     await page.goto('/')
     await log(page, '5k easy run')
