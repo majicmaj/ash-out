@@ -29,7 +29,8 @@ Deployment is automatic — every push to the branch publishes via GitHub Action
 3. **Insights** — aggregate the structured data into trends (workout days, sets,
    volume, distance, time) over a rolling window. _(done)_
 4. **Leaderboard** — rank muscle groups by weekly sets, against the recommended
-   training-volume target. _(done)_
+   training-volume target, plus an anatomical body map (front/back, male/female)
+   that shades each muscle by how much volume it got. _(done)_
 
 Everything stays on-device — no backend, no accounts.
 

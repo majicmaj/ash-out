@@ -1,8 +1,14 @@
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Segmented } from '@/components/Segmented'
 import { useInsights, WINDOW_LABELS, type TimeWindow } from './hooks'
 import { StatCards } from './StatCards'
 import { MuscleLeaderboard } from './MuscleLeaderboard'
+
+// The anatomical chart inlines four full-body SVGs; load it only when the
+// Insights tab is opened so the Journal's initial bundle stays small.
+const MuscleMap = lazy(() =>
+  import('./MuscleMap').then((m) => ({ default: m.MuscleMap })),
+)
 
 const WINDOW_OPTIONS = (Object.keys(WINDOW_LABELS) as TimeWindow[]).map((value) => ({
   value,
@@ -44,6 +50,9 @@ export function InsightsView() {
       ) : (
         <>
           <StatCards insights={insights} />
+          <Suspense fallback={null}>
+            <MuscleMap muscles={insights.muscles} window={window} />
+          </Suspense>
           <MuscleLeaderboard muscles={insights.muscles} window={window} />
         </>
       )}
