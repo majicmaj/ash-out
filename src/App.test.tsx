@@ -67,4 +67,16 @@ describe('App — logging flow', () => {
 
     await waitFor(() => expect(screen.queryByText('temporary note')).not.toBeInTheDocument())
   })
+
+  it('auto-structures a workout and shows muscle-group chips', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+
+    await user.type(screen.getByLabelText(/new log entry/i), 'bench press 3x8 at 60kg')
+    await user.click(screen.getByRole('button', { name: /log it/i }))
+
+    // The background structurer tags the entry without any extra interaction.
+    expect(await screen.findByText('chest')).toBeInTheDocument()
+    expect(await screen.findByText(/kg volume/i)).toBeInTheDocument()
+  })
 })

@@ -4,6 +4,7 @@ import { Button } from '@/components/Button'
 import { Textarea } from '@/components/Textarea'
 import { PencilIcon, TrashIcon, CheckIcon, XIcon } from '@/components/icons'
 import { formatTime } from '@/lib/date'
+import { LogSummaryChips } from '@/features/structure/LogSummaryChips'
 import { deleteLog, updateLog } from './api'
 
 interface LogItemProps {
@@ -31,9 +32,12 @@ export function LogItem({ log }: LogItemProps) {
         {formatTime(log.occurredAt)}
       </time>
 
-      <p className="min-w-0 flex-1 whitespace-pre-wrap break-words text-[15px] leading-relaxed text-slate-200">
-        {log.rawText}
-      </p>
+      <div className="min-w-0 flex-1">
+        <p className="whitespace-pre-wrap break-words text-[15px] leading-relaxed text-slate-200">
+          {log.rawText}
+        </p>
+        <LogSummaryChips log={log} />
+      </div>
 
       {mode === 'confirm-delete' ? (
         <div className="flex shrink-0 items-center gap-1">

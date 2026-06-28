@@ -26,6 +26,16 @@ test.describe('Ashout logging', () => {
     await expect(page.getByLabel(/new log entry/i)).toHaveValue('')
   })
 
+  test('auto-structures a workout into muscle-group and volume chips', async ({ page }) => {
+    await page.goto('/')
+    await log(page, 'bench press 3x8 at 60kg')
+
+    const row = entry(page, 'bench press 3x8 at 60kg')
+    await expect(row.getByText('chest')).toBeVisible()
+    await expect(row.getByText('triceps')).toBeVisible()
+    await expect(row.getByText(/kg volume/i)).toBeVisible()
+  })
+
   test('persists entries across a reload (on-device storage)', async ({ page }) => {
     await page.goto('/')
     await log(page, '5k easy run')
