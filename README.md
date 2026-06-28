@@ -9,6 +9,17 @@ PWA, so it works offline and feels like a native app.
 > **Status: all four steps are built and tested**, end to end and fully
 > on-device. See [`docs/ROADMAP.md`](docs/ROADMAP.md) for what's polished next.
 
+## Try it / install on your phone
+
+Live: **https://majicmaj.github.io/ash-out/**
+
+On Android (Chrome): open the link → tap the **⋮** menu → **Add to Home screen**
+(or **Install app**). It installs as a standalone PWA and works offline, with all
+data stored on the device. On iOS (Safari): **Share** → **Add to Home Screen**.
+
+Deployment is automatic — every push to the branch publishes via GitHub Actions
+(`.github/workflows/deploy.yml`); no servers or credentials involved.
+
 ## The four steps
 
 1. **Capture** — log anything in free text. _(done)_

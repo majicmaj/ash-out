@@ -6,7 +6,15 @@ import { VitePWA } from 'vite-plugin-pwa'
 
 // App build config. Test config lives in vitest.config.ts so the PWA service
 // worker is never generated during unit runs.
+//
+// `base` is '/' for local dev, preview, and E2E, but the GitHub Pages build sets
+// DEPLOY_BASE=/ash-out/ so every asset, the manifest, and the service worker
+// resolve under the project subpath. Keeping it env-driven means tests are
+// unaffected by the deploy path.
+const base = process.env.DEPLOY_BASE ?? '/'
+
 export default defineConfig({
+  base,
   plugins: [
     react(),
     tailwindcss(),
@@ -20,7 +28,8 @@ export default defineConfig({
         theme_color: '#0f172a',
         background_color: '#0f172a',
         display: 'standalone',
-        start_url: '/',
+        scope: base,
+        start_url: base,
         icons: [
           { src: 'pwa-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'pwa-512.png', sizes: '512x512', type: 'image/png' },
@@ -30,7 +39,7 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         // The whole app shell is precached so logging works fully offline.
-        navigateFallback: '/index.html',
+        navigateFallback: `${base}index.html`,
         // The on-device LLM engine is a large, optional chunk: don't precache it
         // for everyone — cache it at runtime the first time AI is enabled, so it
         // still works offline afterwards without bloating every install.
