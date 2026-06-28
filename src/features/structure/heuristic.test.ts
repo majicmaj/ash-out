@@ -49,7 +49,12 @@ describe('parseSets', () => {
 
 describe('estimateVolumeKg', () => {
   it('sums reps × weight', () => {
-    expect(estimateVolumeKg([{ reps: 8, weightKg: 60 }, { reps: 8, weightKg: 60 }])).toBe(960)
+    expect(
+      estimateVolumeKg([
+        { reps: 8, weightKg: 60 },
+        { reps: 8, weightKg: 60 },
+      ]),
+    ).toBe(960)
   })
 
   it('is undefined without loaded reps', () => {

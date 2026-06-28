@@ -2,16 +2,19 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, waitFor, within, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { App } from './App'
+import { StructurerProvider } from './features/structure/StructurerProvider'
+
+const renderApp = () => render(<App />, { wrapper: StructurerProvider })
 
 describe('App — logging flow', () => {
   it('starts on an empty journal', async () => {
-    render(<App />)
+    renderApp()
     expect(await screen.findByText(/start your journal/i)).toBeInTheDocument()
   })
 
   it('logs an entry, then shows it in the journal', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    renderApp()
 
     await user.type(screen.getByLabelText(/new log entry/i), 'bench press 3x8 at 60kg')
     await user.click(screen.getByRole('button', { name: /log it/i }))
@@ -22,7 +25,7 @@ describe('App — logging flow', () => {
 
   it('clears the composer after saving', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    renderApp()
 
     const input = screen.getByLabelText(/new log entry/i) as HTMLTextAreaElement
     await user.type(input, 'oatmeal with banana')
@@ -33,7 +36,7 @@ describe('App — logging flow', () => {
 
   it('edits an existing entry', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    renderApp()
 
     await user.type(screen.getByLabelText(/new log entry/i), 'sqats 5x5')
     await user.click(screen.getByRole('button', { name: /log it/i }))
@@ -55,7 +58,7 @@ describe('App — logging flow', () => {
 
   it('deletes an entry after confirmation', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    renderApp()
 
     await user.type(screen.getByLabelText(/new log entry/i), 'temporary note')
     await user.click(screen.getByRole('button', { name: /log it/i }))
@@ -70,7 +73,7 @@ describe('App — logging flow', () => {
 
   it('auto-structures a workout and shows muscle-group chips', async () => {
     const user = userEvent.setup()
-    render(<App />)
+    renderApp()
 
     await user.type(screen.getByLabelText(/new log entry/i), 'bench press 3x8 at 60kg')
     await user.click(screen.getByRole('button', { name: /log it/i }))

@@ -12,11 +12,48 @@ import { estimateVolumeKg, parseSets } from './sets'
  */
 
 const MEAL_HINTS = [
-  'ate', 'eat', 'eaten', 'breakfast', 'lunch', 'dinner', 'snack', 'snacked', 'meal',
-  'drank', 'shake', 'smoothie', 'coffee', 'tea', 'oatmeal', 'egg', 'chicken', 'beef',
-  'steak', 'rice', 'salad', 'banana', 'apple', 'yogurt', 'toast', 'bread', 'pasta',
-  'fish', 'salmon', 'tuna', 'sandwich', 'burger', 'pizza', 'soup', 'beans', 'nuts',
-  'fruit', 'milk', 'cheese', 'protein', 'calories', 'kcal',
+  'ate',
+  'eat',
+  'eaten',
+  'breakfast',
+  'lunch',
+  'dinner',
+  'snack',
+  'snacked',
+  'meal',
+  'drank',
+  'shake',
+  'smoothie',
+  'coffee',
+  'tea',
+  'oatmeal',
+  'egg',
+  'chicken',
+  'beef',
+  'steak',
+  'rice',
+  'salad',
+  'banana',
+  'apple',
+  'yogurt',
+  'toast',
+  'bread',
+  'pasta',
+  'fish',
+  'salmon',
+  'tuna',
+  'sandwich',
+  'burger',
+  'pizza',
+  'soup',
+  'beans',
+  'nuts',
+  'fruit',
+  'milk',
+  'cheese',
+  'protein',
+  'calories',
+  'kcal',
 ]
 
 /** Split into the smallest meaningful units: lines, then clauses. */
@@ -36,7 +73,10 @@ function hasMealHint(lower: string): boolean {
 function exerciseName(clause: string): string {
   const name = clause
     .replace(/\d+\s*[xX×]\s*\d+/g, ' ')
-    .replace(/\d+(?:\.\d+)?\s*(kgs?|kilos?|lbs?|pounds?|kms?|kilomet(?:er|re)s?|k|mi|miles?|m|met(?:er|re)s?|h|hrs?|hours?|mins?|minutes?|s|secs?|seconds?|reps?|sets?)\b/gi, ' ')
+    .replace(
+      /\d+(?:\.\d+)?\s*(kgs?|kilos?|lbs?|pounds?|kms?|kilomet(?:er|re)s?|k|mi|miles?|m|met(?:er|re)s?|h|hrs?|hours?|mins?|minutes?|s|secs?|seconds?|reps?|sets?)\b/gi,
+      ' ',
+    )
     .replace(/\b(at|for|of|x|sets? of)\b/gi, ' ')
     .replace(/[@#]/g, ' ')
     .replace(/\s+/g, ' ')
@@ -76,7 +116,9 @@ export function structureClause(clause: string): StructuredEvent {
   const lower = clause.toLowerCase()
   const muscleGroups = muscleGroupsFor(clause)
   const looksWorkout =
-    muscleGroups.length > 0 || parseSets(clause) !== undefined || parseDistanceM(clause) !== undefined
+    muscleGroups.length > 0 ||
+    parseSets(clause) !== undefined ||
+    parseDistanceM(clause) !== undefined
 
   if (looksWorkout) return toWorkout(clause)
   if (hasMealHint(lower)) return { kind: 'meal', description: clause } satisfies MealEvent
@@ -87,6 +129,5 @@ export const heuristicStructurer: Structurer = {
   id: 'heuristic',
   label: 'Built-in parser',
   isAvailable: () => Promise.resolve(true),
-  structure: (rawText: string) =>
-    Promise.resolve(splitClauses(rawText).map(structureClause)),
+  structure: (rawText: string) => Promise.resolve(splitClauses(rawText).map(structureClause)),
 }

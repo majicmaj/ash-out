@@ -16,6 +16,7 @@
 components/  reusable, presentational UI primitives (Button, Modal, Textarea, icons)
 features/    vertical slices — each owns its api (writes), hooks (live reads), and views
   logs/        capture + journal (step 1)
+  structure/   pluggable structuring engines + insight chips (step 2)
   data/        export / import / clear
 db/          Dexie instance + the EventLog data model
 lib/         framework-free helpers (date, id, cn, file)
@@ -36,6 +37,24 @@ needed when structuring lands.
 The journal query reads the whole table and sorts in `groupLogsByDay` rather than
 relying on an index. At personal-journal scale this is effectively free and makes
 the live query observe every record, so edits to any field reliably refresh the UI.
+
+## Structuring engines (step 2)
+
+Structuring sits behind one `Structurer` interface (`structure(rawText) →
+StructuredEvent[]` + `isAvailable()`), so the orchestration and UI never know
+which engine ran:
+
+- **Heuristic** — pure, rule-based, instant, offline. Splits text into clauses,
+  classifies each (workout/meal/note), and extracts measures + muscle groups.
+  This is the default and the fully-tested baseline.
+- **WebLLM** — optional on-device LLM (WebGPU), dynamically imported so its ~6 MB
+  engine chunk never loads unless enabled, with grammar-constrained JSON output
+  fed through a defensive normalizer. Selected via a small React context that
+  persists the choice and resumes it next visit.
+
+A live-query–driven hook (`useAutoStructure`) processes any `raw` log with the
+active engine, so new entries, edits, and imports are all structured without
+explicit triggering. The raw text is never mutated — structuring only annotates.
 
 ## PWA / offline
 

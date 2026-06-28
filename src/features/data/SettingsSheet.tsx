@@ -5,6 +5,7 @@ import { DownloadIcon, UploadIcon, TrashIcon } from '@/components/icons'
 import { datedFilename, downloadTextFile, pickTextFile } from '@/lib/file'
 import { useLogCount } from '@/features/logs/hooks'
 import { clearAllLogs } from '@/features/logs/api'
+import { AISettings } from '@/features/structure/AISettings'
 import { exportLogs, importLogs } from './transfer'
 
 interface SettingsSheetProps {
@@ -92,13 +93,7 @@ export function SettingsSheet({ open, onClose }: SettingsSheetProps) {
         </p>
       )}
 
-      <div className="mt-5 rounded-xl border border-dashed border-slate-700 p-3">
-        <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">Coming next</p>
-        <p className="mt-1 text-sm text-slate-400">
-          On-device AI will turn these notes into structured workouts and meals, then surface
-          insights and muscle-group leaderboards — all without a server.
-        </p>
-      </div>
+      <AISettings />
     </Modal>
   )
 }

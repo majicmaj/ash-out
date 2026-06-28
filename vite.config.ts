@@ -31,12 +31,34 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         // The whole app shell is precached so logging works fully offline.
         navigateFallback: '/index.html',
+        // The on-device LLM engine is a large, optional chunk: don't precache it
+        // for everyone — cache it at runtime the first time AI is enabled, so it
+        // still works offline afterwards without bloating every install.
+        globIgnores: ['**/webllm-*.js'],
+        runtimeCaching: [
+          {
+            urlPattern: /\/assets\/webllm-.*\.js$/,
+            handler: 'CacheFirst',
+            options: { cacheName: 'webllm-engine', expiration: { maxEntries: 2 } },
+          },
+        ],
       },
     }),
   ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        // Give the heavy, lazily-imported LLM engine a stable chunk name so the
+        // service worker can single it out (see workbox.globIgnores above).
+        manualChunks(id) {
+          if (id.includes('@mlc-ai/web-llm')) return 'webllm'
+        },
+      },
     },
   },
 })

@@ -11,17 +11,21 @@ Log anything in free text; persist locally; browse, edit, delete; export/import.
 - Journal grouped by day, newest first.
 - IndexedDB (Dexie) + live queries; offline PWA.
 
-## Step 2 — Structure (on-device LLM)
+## Step 2 — Structure ✅
 
-Turn each line of a raw log into structured events (workout / meal / note).
+Turn each clause of a raw log into structured events (workout / meal / note).
 
-- Run a small instruct model in-browser via **WebLLM** (WebGPU), with
-  **grammar-constrained JSON** (XGrammar) so output always matches the schema.
-- Process per line; write results into `EventLog.structured` with the `modelId`.
-- Graceful path when WebGPU is unavailable (queue as `raw`, offer retry).
-- Model is downloaded once and cached; show progress + let the user pick model size.
-- Target fields already declared in `src/db/types.ts` (exercise, sets, muscle
-  groups, macros).
+- **Heuristic parser (default, built):** free, instant, offline — no download, no
+  GPU. Parses sets/reps/weight, cardio distance/duration, maps exercises to
+  muscle groups, computes volume. Runs automatically in the background.
+- **On-device LLM (optional, built):** **WebLLM** (WebGPU) with
+  **grammar-constrained JSON** output, behind the same `Structurer` interface.
+  WebGPU-gated, model downloaded once and cached, with progress + model choice in
+  settings; falls back to the heuristic when unavailable.
+- Derived insight chips (muscle tags, volume, distance, duration, meal) show
+  under each entry. Results written to `EventLog.structured` with `modelId`.
+
+Next here: re-structure existing entries when AI is enabled; per-event editing.
 
 ## Step 3 — Insights
 

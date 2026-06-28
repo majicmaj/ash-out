@@ -6,19 +6,21 @@ Write down what you did in plain words — _"bench press 3x8 at 60kg, then a 5k 
 and Ashout keeps it. No accounts, no server, no network required. It's an installable
 PWA, so it works offline and feels like a native app.
 
-> **Status: Step 1 (capture) is built and tested.** On-device AI structuring,
-> insights, and muscle-group leaderboards are designed and on the roadmap — see
+> **Status: Steps 1–2 are built and tested.** Capture works, and entries are
+> auto-structured on-device. Insights and leaderboards are next — see
 > [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## The four steps
 
 1. **Capture** — log anything in free text. _(done)_
-2. **Structure** — an on-device LLM turns each line into structured workouts/meals.
+2. **Structure** — entries are parsed into workouts/meals on-device: a free
+   instant heuristic parser by default, with an optional **WebLLM** (WebGPU)
+   model for richer extraction. _(done)_
 3. **Insights** — aggregate the structured data into trends and summaries.
 4. **Leaderboards** — rank muscle groups by volume over time.
 
-Steps 2–4 need no backend either; everything stays on-device. The data model and UI
-are already shaped so they slot in without a rewrite.
+Everything stays on-device — no backend. The structured data already carries the
+muscle-group and volume fields that steps 3–4 will aggregate.
 
 ## Tech
 
@@ -70,6 +72,7 @@ src/
   db/            data model + Dexie instance
   features/
     logs/        capture, journal, edit/delete (step 1)
+    structure/   structuring engines (heuristic + WebLLM) + insight chips (step 2)
     data/        export / import / clear
   components/    reusable UI primitives
   lib/           tiny framework-free helpers (dates, ids, files)

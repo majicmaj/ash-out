@@ -17,6 +17,7 @@
     "test:e2e:install": "playwright install chromium"
   },
   "dependencies": {
+    "@mlc-ai/web-llm": "^0.2.84",
     "dexie": "^4.4.4",
     "dexie-react-hooks": "^4.4.0",
     "react": "^19.2.7",

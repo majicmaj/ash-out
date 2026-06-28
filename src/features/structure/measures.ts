@@ -21,11 +21,14 @@ export function parseWeightKg(text: string): number | undefined {
 
 /** Distance in metres from "5k", "5km", "800m", "3mi", "3 miles". */
 export function parseDistanceM(text: string): number | undefined {
-  const m = text.match(/(\d+(?:\.\d+)?)\s*(kms?|kilomet(?:er|re)s?|k|mi|miles?|m|met(?:er|re)s?)\b/i)
+  const m = text.match(
+    /(\d+(?:\.\d+)?)\s*(kms?|kilomet(?:er|re)s?|k|mi|miles?|m|met(?:er|re)s?)\b/i,
+  )
   if (!m) return undefined
   const value = parseFloat(m[1])
   const unit = m[2].toLowerCase()
-  if (unit === 'k' || unit.startsWith('km') || unit.startsWith('kilomet')) return Math.round(value * 1000)
+  if (unit === 'k' || unit.startsWith('km') || unit.startsWith('kilomet'))
+    return Math.round(value * 1000)
   if (unit === 'mi' || unit.startsWith('mile')) return Math.round(value * MILE_TO_M)
   return Math.round(value) // metres
 }
@@ -38,7 +41,9 @@ export function parseDistanceM(text: string): number | undefined {
 export function parseDurationSec(text: string): number | undefined {
   let total = 0
   let found = false
-  for (const m of text.matchAll(/(\d+(?:\.\d+)?)\s*(h|hrs?|hours?|mins?|minutes?|s|secs?|seconds?)\b/gi)) {
+  for (const m of text.matchAll(
+    /(\d+(?:\.\d+)?)\s*(h|hrs?|hours?|mins?|minutes?|s|secs?|seconds?)\b/gi,
+  )) {
     const value = parseFloat(m[1])
     const unit = m[2].toLowerCase()
     if (unit === 'h' || unit.startsWith('hr') || unit.startsWith('hour')) total += value * 3600
