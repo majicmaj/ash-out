@@ -25,10 +25,8 @@ jobs:
         with:
           node-version: 22
           cache: npm
-      - name: Enable Pages (GitHub Actions source)
+      - name: Configure Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
       - run: npm ci
       - name: Build for the /ash-out/ subpath
         run: npm run build
