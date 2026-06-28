@@ -1,0 +1,27 @@
+node_modules
+dist
+dist-ssr
+dev-dist
+*.local
+*.tsbuildinfo
+.DS_Store
+
+# local run artifacts
+.screenshots
+e2e-run.log
+preview.log
+
+# test artifacts
+coverage
+playwright-report
+test-results
+.playwright
+
+# editor
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# logs
+*.log
+npm-debug.log*

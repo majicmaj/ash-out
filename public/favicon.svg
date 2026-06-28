@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Ashout">
+  <rect width="512" height="512" rx="112" fill="#0f172a" />
+  <g
+    fill="none"
+    stroke="#f59e0b"
+    stroke-width="34"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  >
+    <path d="M150 150v212M104 192v128M362 150v212M408 192v128M150 256h212" />
+  </g>
+</svg>

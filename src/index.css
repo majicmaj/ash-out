@@ -1,0 +1,42 @@
+@import 'tailwindcss';
+
+/* Dark-first. The .dark class on <html> is the default; the app is designed
+   for low-light, one-handed phone use. */
+@variant dark (&:where(.dark, .dark *));
+
+/* Brand: embers over ash. Amber accent on deep slate. Exposed as tokens so
+   components reference `bg-accent` / `text-accent` instead of raw hex. */
+@theme {
+  --color-accent: var(--color-amber-500);
+  --color-accent-hover: var(--color-amber-400);
+  --color-accent-contrast: var(--color-slate-950);
+
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+html {
+  background-color: var(--color-slate-950);
+  color-scheme: dark;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  font-family: var(--font-sans);
+}
+
+/* Respect users who installed the PWA: pad for notches / home indicators. */
+.safe-bottom {
+  padding-bottom: max(env(safe-area-inset-bottom), 0px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}
