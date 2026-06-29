@@ -1,34 +1,37 @@
 import { cn } from '@/lib/cn'
-import { targetFor, type MuscleStat } from './aggregate'
+import { scaleTarget, targetFor, type MuscleStat } from './aggregate'
 
 export type MuscleMetric = 'count' | 'target'
 
 /**
  * The per-muscle-group breakdown, in one of two views:
  *  - `count`: ranked by sets trained (raw training volume).
- *  - `target`: each group against its appropriate weekly set target, so the
- *    chart reads as progress toward a goal. Bars turn green once a group is in
- *    its recommended range.
+ *  - `target`: each group against its set target for the selected window
+ *    (the weekly target scaled to the window — a daily share for "Today", a
+ *    month's worth for "30 days"). Bars turn green once a group is in range.
  */
 export function MuscleLeaderboard({
   muscles,
   metric,
+  windowDays = 7,
 }: {
   muscles: MuscleStat[]
   metric: MuscleMetric
+  windowDays?: number
 }) {
   if (muscles.length === 0) return null
 
   if (metric === 'target') {
+    const targets = new Map(muscles.map((m) => [m.group, scaleTarget(targetFor(m.group), windowDays)]))
     const ranked = [...muscles].sort(
-      (a, b) => b.sets / targetFor(b.group).min - a.sets / targetFor(a.group).min,
+      (a, b) => b.sets / targets.get(b.group)!.min - a.sets / targets.get(a.group)!.min,
     )
     return (
       <section>
-        <h3 className="mb-3 text-sm font-semibold text-slate-300">Weekly target progress</h3>
+        <h3 className="mb-3 text-sm font-semibold text-slate-300">Target progress</h3>
         <ul className="space-y-2.5">
           {ranked.map((m) => {
-            const target = targetFor(m.group)
+            const target = targets.get(m.group)!
             const onTarget = m.sets >= target.min
             return (
               <li key={m.group}>
@@ -49,8 +52,8 @@ export function MuscleLeaderboard({
           })}
         </ul>
         <p className="mt-3 text-xs text-slate-500">
-          Targets are the recommended weekly sets for each group. Bars turn green once a group is in
-          range.
+          Targets are the recommended sets per group, scaled to the selected time range. Bars turn
+          green once a group is in range.
         </p>
       </section>
     )

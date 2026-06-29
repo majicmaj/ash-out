@@ -21,10 +21,20 @@ function windowStart(window: TimeWindow): number {
   return Number.isFinite(days) ? Date.now() - days * 86_400_000 : 0
 }
 
-/** Live insights for a time window. Recomputes whenever logs change. */
+/** Live insights for a time window. Recomputes whenever logs change. The
+ *  window's span (in days) is attached so targets can scale to it — for "all
+ *  time" it's the actual stretch from the first entry to now. */
 export function useInsights(window: TimeWindow): Insights | undefined {
   return useLiveQuery(async () => {
     const logs = await db.logs.toArray()
-    return computeInsights(filterSince(logs, windowStart(window)))
+    const scoped = filterSince(logs, windowStart(window))
+    const insights = computeInsights(scoped)
+    return { ...insights, windowDays: windowDaysFor(window, scoped) }
   }, [window])
+}
+
+function windowDaysFor(window: TimeWindow, scoped: { occurredAt: number }[]): number {
+  if (window !== 'all') return WINDOW_DAYS[window]
+  const earliest = scoped.length ? Math.min(...scoped.map((l) => l.occurredAt)) : Date.now()
+  return Math.max(1, Math.ceil((Date.now() - earliest) / 86_400_000))
 }

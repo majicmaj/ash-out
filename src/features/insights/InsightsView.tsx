@@ -70,7 +70,11 @@ export function InsightsView() {
               />
             </div>
           )}
-          <MuscleLeaderboard muscles={insights.muscles} metric={metric} />
+          <MuscleLeaderboard
+            muscles={insights.muscles}
+            metric={metric}
+            windowDays={insights.windowDays}
+          />
         </>
       )}
     </div>

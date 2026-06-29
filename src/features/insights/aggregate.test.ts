@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { EventLog, StructuredEvent } from '@/db/types'
-import { computeInsights, filterSince, targetFor } from './aggregate'
+import { computeInsights, filterSince, scaleTarget, targetFor } from './aggregate'
 
 let counter = 0
 function log(structured: StructuredEvent[], occurredAt = Date.now()): EventLog {
@@ -124,5 +124,20 @@ describe('targetFor', () => {
 
   it('falls back to the generic range for groups without a specific target', () => {
     expect(targetFor('other')).toEqual({ min: 10, max: 20 })
+  })
+})
+
+describe('scaleTarget', () => {
+  it('leaves a 7-day window unchanged', () => {
+    expect(scaleTarget({ min: 8, max: 14 }, 7)).toEqual({ min: 8, max: 14 })
+  })
+
+  it('shrinks to a daily share for a 1-day window', () => {
+    expect(scaleTarget({ min: 10, max: 20 }, 1)).toEqual({ min: 1, max: 3 })
+  })
+
+  it('grows for a 30-day window and never drops below 1', () => {
+    expect(scaleTarget({ min: 10, max: 20 }, 30)).toEqual({ min: 43, max: 86 })
+    expect(scaleTarget({ min: 0, max: 0 }, 30).min).toBe(1)
   })
 })

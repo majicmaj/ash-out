@@ -26,6 +26,8 @@ export interface Insights {
   mealCount: number
   /** Non-cardio groups, ranked by sets descending. */
   muscles: MuscleStat[]
+  /** Days the window spans, for scaling targets. Set by the hook, not here. */
+  windowDays?: number
 }
 
 /** Recommended weekly set range per muscle group, for the leaderboard scale. */
@@ -58,6 +60,19 @@ export const WEEKLY_SET_TARGETS: Record<MuscleGroup, SetTarget> = {
 export function targetFor(group: MuscleGroup): SetTarget {
   const t = WEEKLY_SET_TARGETS[group]
   return t.max > 0 ? t : OPTIMAL_WEEKLY_SETS
+}
+
+/**
+ * Scale a weekly set target to a window of `windowDays`, so "Today" compares
+ * against a daily share and "30 days" against a month's worth. Rounded, with a
+ * floor of 1 so a target never collapses to zero.
+ */
+export function scaleTarget(target: SetTarget, windowDays: number): SetTarget {
+  const factor = windowDays / 7
+  return {
+    min: Math.max(1, Math.round(target.min * factor)),
+    max: Math.max(1, Math.round(target.max * factor)),
+  }
 }
 
 export function computeInsights(logs: readonly EventLog[]): Insights {
