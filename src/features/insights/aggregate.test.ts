@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import type { EventLog, StructuredEvent } from '@/db/types'
-import { computeInsights, filterSince } from './aggregate'
+import { computeInsights, filterSince, targetFor } from './aggregate'
 
 let counter = 0
 function log(structured: StructuredEvent[], occurredAt = Date.now()): EventLog {
@@ -113,5 +113,16 @@ describe('filterSince', () => {
   it('keeps only logs at or after the cutoff', () => {
     const logs = [log([], 100), log([], 200), log([], 300)]
     expect(filterSince(logs, 200)).toHaveLength(2)
+  })
+})
+
+describe('targetFor', () => {
+  it('gives larger groups a higher weekly set target than smaller ones', () => {
+    expect(targetFor('legs').max).toBeGreaterThan(targetFor('biceps').max)
+    expect(targetFor('chest').min).toBeGreaterThanOrEqual(targetFor('triceps').min)
+  })
+
+  it('falls back to the generic range for groups without a specific target', () => {
+    expect(targetFor('other')).toEqual({ min: 10, max: 20 })
   })
 })

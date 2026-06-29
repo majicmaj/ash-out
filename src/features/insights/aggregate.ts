@@ -31,6 +31,35 @@ export interface Insights {
 /** Recommended weekly set range per muscle group, for the leaderboard scale. */
 export const OPTIMAL_WEEKLY_SETS = { min: 10, max: 20 } as const
 
+export interface SetTarget {
+  min: number
+  max: number
+}
+
+/**
+ * Appropriate weekly working-set range per muscle group (common hypertrophy
+ * guidance — large groups tolerate more volume than small ones). Used by the
+ * "vs target" insights view. Cardio/other have no set target.
+ */
+export const WEEKLY_SET_TARGETS: Record<MuscleGroup, SetTarget> = {
+  chest: { min: 10, max: 20 },
+  back: { min: 10, max: 20 },
+  legs: { min: 12, max: 20 },
+  shoulders: { min: 8, max: 16 },
+  glutes: { min: 8, max: 16 },
+  core: { min: 8, max: 16 },
+  biceps: { min: 8, max: 14 },
+  triceps: { min: 8, max: 14 },
+  cardio: { min: 0, max: 0 },
+  other: { min: 0, max: 0 },
+}
+
+/** The weekly set target for a group, falling back to the generic range. */
+export function targetFor(group: MuscleGroup): SetTarget {
+  const t = WEEKLY_SET_TARGETS[group]
+  return t.max > 0 ? t : OPTIMAL_WEEKLY_SETS
+}
+
 export function computeInsights(logs: readonly EventLog[]): Insights {
   const byMuscle = new Map<MuscleGroup, MuscleStat>()
   const workoutDayKeys = new Set<number>()
