@@ -29,6 +29,20 @@ export const PlusIcon = (p: SVGProps<SVGSVGElement>) => (
   </Icon>
 )
 
+export const JournalIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Icon {...p}>
+    <path d="M4 5a2 2 0 0 1 2-2h12a1 1 0 0 1 1 1v15a1 1 0 0 1-1 1H6a2 2 0 0 1-2-2z" />
+    <path d="M8 7h7M8 11h7M8 15h4" />
+  </Icon>
+)
+
+export const ChartIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Icon {...p}>
+    <path d="M7 16V10M12 16V6M17 16v-4" />
+    <path d="M4 20h16" />
+  </Icon>
+)
+
 export const TrashIcon = (p: SVGProps<SVGSVGElement>) => (
   <Icon {...p}>
     <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />

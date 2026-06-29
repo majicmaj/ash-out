@@ -7,7 +7,7 @@ import { useWeightUnit } from '@/features/settings/weightUnit'
 import { updateLog, updateLogStructured } from './api'
 
 const numCls =
-  'w-14 rounded-md bg-slate-800 px-2 py-1 text-sm tabular-nums text-slate-100 outline-none focus:ring-1 focus:ring-accent'
+  'min-w-0 flex-1 rounded-md bg-slate-800 px-2.5 py-1.5 text-sm tabular-nums text-slate-100 outline-none focus:ring-1 focus:ring-accent'
 const textCls =
   'w-full rounded-md bg-slate-800 px-2 py-1 text-[15px] text-slate-100 outline-none focus:ring-1 focus:ring-accent'
 
@@ -136,16 +136,17 @@ function EventEditor({
 
       {sets.length > 0 && (
         <div className="mb-1 flex items-center gap-2 text-xs font-medium text-slate-500">
-          <span className="w-8 shrink-0">Set</span>
-          <span className="w-14">Reps</span>
+          <span className="w-6 shrink-0">Set</span>
+          <span className="flex-1">Reps</span>
           <span className="w-4" aria-hidden />
-          <span className="w-14">Weight ({unit})</span>
+          <span className="flex-1">Weight ({unit})</span>
+          <span className="w-7 shrink-0" aria-hidden />
         </div>
       )}
       <div className="space-y-1.5">
         {sets.map((set, i) => (
           <div key={i} className="flex items-center gap-2 text-sm text-slate-400">
-            <span className="w-8 shrink-0 tabular-nums text-slate-500">{i + 1}</span>
+            <span className="w-6 shrink-0 tabular-nums text-slate-500">{i + 1}</span>
             <input
               type="number"
               inputMode="numeric"
