@@ -2,6 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/db'
 import { startOfDay } from '@/lib/date'
 import { computeInsights, filterSince, type Insights } from './aggregate'
+import { computeRecords, type ExerciseRecord } from './records'
 
 export type TimeWindow = 'day' | 'week' | 'month' | 'all'
 
@@ -30,6 +31,14 @@ export function useInsights(window: TimeWindow): Insights | undefined {
     const scoped = filterSince(logs, windowStart(window))
     const insights = computeInsights(scoped)
     return { ...insights, windowDays: windowDaysFor(window, scoped) }
+  }, [window])
+}
+
+/** Live per-exercise personal records; PRs in the window are flagged. */
+export function useRecords(window: TimeWindow): ExerciseRecord[] | undefined {
+  return useLiveQuery(async () => {
+    const logs = await db.logs.toArray()
+    return computeRecords(logs, windowStart(window))
   }, [window])
 }
 

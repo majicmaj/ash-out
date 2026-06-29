@@ -1,8 +1,9 @@
 import { lazy, Suspense, useState } from 'react'
 import { Segmented } from '@/components/Segmented'
-import { useInsights, WINDOW_LABELS, type TimeWindow } from './hooks'
+import { useInsights, useRecords, WINDOW_LABELS, type TimeWindow } from './hooks'
 import { StatCards } from './StatCards'
 import { MuscleLeaderboard, type MuscleMetric } from './MuscleLeaderboard'
+import { PersonalRecords } from './PersonalRecords'
 
 // The anatomical chart inlines four full-body SVGs; load it only when the
 // Insights tab is opened so the Journal's initial bundle stays small.
@@ -26,6 +27,7 @@ export function InsightsView() {
   const [window, setWindow] = useState<TimeWindow>('week')
   const [metric, setMetric] = useState<MuscleMetric>('count')
   const insights = useInsights(window)
+  const records = useRecords(window)
 
   const hasData =
     insights &&
@@ -75,6 +77,7 @@ export function InsightsView() {
             metric={metric}
             windowDays={insights.windowDays}
           />
+          <PersonalRecords records={records ?? []} />
         </>
       )}
     </div>
