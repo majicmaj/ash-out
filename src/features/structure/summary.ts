@@ -1,4 +1,5 @@
 import type { ExerciseSet, MuscleGroup, StructuredEvent } from '@/db/types'
+import type { WeightUnit } from '@/features/settings/weightUnit'
 
 /**
  * Derive compact, display-ready chips for a log from its structured events.
@@ -11,7 +12,10 @@ export interface LogSummary {
   hasMeal: boolean
 }
 
-export function summarizeLog(structured: StructuredEvent[] | undefined): LogSummary {
+export function summarizeLog(
+  structured: StructuredEvent[] | undefined,
+  unit: WeightUnit = 'kg',
+): LogSummary {
   const muscles = new Set<MuscleGroup>()
   let volumeKg = 0
   let distanceM = 0
@@ -30,7 +34,7 @@ export function summarizeLog(structured: StructuredEvent[] | undefined): LogSumm
   }
 
   const metrics: string[] = []
-  if (volumeKg > 0) metrics.push(`${formatNumber(volumeKg)} kg volume`)
+  if (volumeKg > 0) metrics.push(`${formatNumber(volumeKg)} ${unit} volume`)
   if (distanceM > 0) metrics.push(formatDistance(distanceM))
   if (durationSec > 0) metrics.push(formatDuration(durationSec))
 
@@ -47,7 +51,7 @@ function formatWeight(kg: number): string {
 }
 
 /** One set as a compact label: "3×100", "8 reps", "60 kg", or a cardio metric. */
-export function formatSet(set: ExerciseSet): string {
+export function formatSet(set: ExerciseSet, unit: WeightUnit = 'kg'): string {
   if (set.distanceM || set.durationSec) {
     const parts: string[] = []
     if (set.distanceM) parts.push(formatDistance(set.distanceM))
@@ -57,7 +61,7 @@ export function formatSet(set: ExerciseSet): string {
   if (set.reps !== undefined && set.weightKg !== undefined)
     return `${set.reps}×${formatWeight(set.weightKg)}`
   if (set.reps !== undefined) return `${set.reps} reps`
-  if (set.weightKg !== undefined) return `${formatWeight(set.weightKg)} kg`
+  if (set.weightKg !== undefined) return `${formatWeight(set.weightKg)} ${unit}`
   return '—'
 }
 

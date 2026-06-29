@@ -3,6 +3,7 @@ import type { EventLog, ExerciseSet, StructuredEvent } from '@/db/types'
 import { Button } from '@/components/Button'
 import { Textarea } from '@/components/Textarea'
 import { PlusIcon, TrashIcon } from '@/components/icons'
+import { useWeightUnit } from '@/features/settings/weightUnit'
 import { updateLog, updateLogStructured } from './api'
 
 const numCls =
@@ -94,6 +95,7 @@ function EventEditor({
   onChange: (next: StructuredEvent) => void
   onRemove: () => void
 }) {
+  const unit = useWeightUnit()
   if (event.kind !== 'workout') {
     const value = event.kind === 'meal' ? event.description : event.text
     return (
@@ -132,9 +134,18 @@ function EventEditor({
         <RemoveButton label="Remove exercise" onClick={onRemove} />
       </div>
 
+      {sets.length > 0 && (
+        <div className="mb-1 flex items-center gap-2 text-xs font-medium text-slate-500">
+          <span className="w-8 shrink-0">Set</span>
+          <span className="w-14">Reps</span>
+          <span className="w-4" aria-hidden />
+          <span className="w-14">Weight ({unit})</span>
+        </div>
+      )}
       <div className="space-y-1.5">
         {sets.map((set, i) => (
           <div key={i} className="flex items-center gap-2 text-sm text-slate-400">
+            <span className="w-8 shrink-0 tabular-nums text-slate-500">{i + 1}</span>
             <input
               type="number"
               inputMode="numeric"
@@ -144,7 +155,9 @@ function EventEditor({
               placeholder="reps"
               onChange={(e) => patchSet(i, { reps: toNum(e.target.value) })}
             />
-            <span>×</span>
+            <span className="w-4 text-center" aria-hidden>
+              ×
+            </span>
             <input
               type="number"
               inputMode="decimal"

@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import type { EventLog } from '@/db/types'
 import { cn } from '@/lib/cn'
+import { useWeightUnit } from '@/features/settings/weightUnit'
 import { summarizeLog } from './summary'
 
 type Tone = 'muscle' | 'meal' | 'metric'
@@ -25,9 +26,10 @@ function Pill({ tone, children }: { tone: Tone; children: ReactNode }) {
  * and produced something worth showing.
  */
 export function LogSummaryChips({ log }: { log: EventLog }) {
+  const unit = useWeightUnit()
   if (log.status !== 'structured') return null
 
-  const { muscles, metrics, hasMeal } = summarizeLog(log.structured)
+  const { muscles, metrics, hasMeal } = summarizeLog(log.structured, unit)
   if (muscles.length === 0 && metrics.length === 0 && !hasMeal) return null
 
   return (

@@ -1,4 +1,5 @@
 import type { StructuredEvent } from '@/db/types'
+import { useWeightUnit } from '@/features/settings/weightUnit'
 import { formatSet } from '@/features/structure/summary'
 
 /**
@@ -7,6 +8,7 @@ import { formatSet } from '@/features/structure/summary'
  * text blob once structuring has produced something.
  */
 export function LogStructuredView({ structured }: { structured: StructuredEvent[] }) {
+  const unit = useWeightUnit()
   return (
     <div className="space-y-1">
       {structured.map((event, i) => {
@@ -33,7 +35,7 @@ export function LogStructuredView({ structured }: { structured: StructuredEvent[
                 key={si}
                 className="rounded bg-slate-800 px-1.5 py-0.5 text-xs tabular-nums text-slate-300"
               >
-                {formatSet(set)}
+                {formatSet(set, unit)}
               </span>
             ))}
           </div>

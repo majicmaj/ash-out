@@ -1,20 +1,20 @@
 import { describe, it, expect } from 'vitest'
-import { parseWeightKg, parseDistanceM, parseDurationSec } from './measures'
+import { parseWeight, parseDistanceM, parseDurationSec } from './measures'
 
-describe('parseWeightKg', () => {
-  it('parses kg', () => {
-    expect(parseWeightKg('bench 60kg')).toBe(60)
-    expect(parseWeightKg('60 kg')).toBe(60)
-    expect(parseWeightKg('squat 82.5 kg')).toBe(82.5)
+describe('parseWeight', () => {
+  it('parses the typed number', () => {
+    expect(parseWeight('bench 60kg')).toBe(60)
+    expect(parseWeight('60 kg')).toBe(60)
+    expect(parseWeight('squat 82.5 kg')).toBe(82.5)
   })
 
-  it('converts pounds to kg', () => {
-    expect(parseWeightKg('135 lb')).toBe(61.2)
-    expect(parseWeightKg('225 lbs')).toBe(102.1)
+  it('keeps the number as typed regardless of unit (unit is a display choice)', () => {
+    expect(parseWeight('135 lb')).toBe(135)
+    expect(parseWeight('225 lbs')).toBe(225)
   })
 
   it('returns undefined when no weight', () => {
-    expect(parseWeightKg('5k run')).toBeUndefined()
+    expect(parseWeight('5k run')).toBeUndefined()
   })
 })
 

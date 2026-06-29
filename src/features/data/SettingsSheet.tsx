@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import { Modal } from '@/components/Modal'
 import { Button } from '@/components/Button'
+import { Segmented } from '@/components/Segmented'
 import { DownloadIcon, UploadIcon, TrashIcon } from '@/components/icons'
+import { setWeightUnit, useWeightUnit, type WeightUnit } from '@/features/settings/weightUnit'
 import { datedFilename, downloadTextFile, pickTextFile } from '@/lib/file'
 import { useLogCount } from '@/features/logs/hooks'
 import { clearAllLogs } from '@/features/logs/api'
@@ -17,6 +19,7 @@ interface SettingsSheetProps {
  *  on the local device. */
 export function SettingsSheet({ open, onClose }: SettingsSheetProps) {
   const count = useLogCount()
+  const unit = useWeightUnit()
   const [message, setMessage] = useState<string | null>(null)
   const [confirmClear, setConfirmClear] = useState(false)
 
@@ -51,6 +54,19 @@ export function SettingsSheet({ open, onClose }: SettingsSheetProps) {
       </p>
 
       <div className="space-y-2">
+        <Row label="Weight unit" desc="How weights are labelled and shown.">
+          <Segmented
+            ariaLabel="Weight unit"
+            size="sm"
+            value={unit}
+            onChange={(v: WeightUnit) => setWeightUnit(v)}
+            options={[
+              { value: 'kg', label: 'kg' },
+              { value: 'lb', label: 'lb' },
+            ]}
+          />
+        </Row>
+
         <Row label="Export a backup" desc="Download every entry as a JSON file.">
           <Button size="sm" variant="ghost" onClick={() => void handleExport()}>
             <DownloadIcon width={16} height={16} />

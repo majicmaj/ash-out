@@ -52,8 +52,8 @@ describe('parseSetLine', () => {
     expect(parseSetLine('5x5')).toEqual([{ reps: 5 }, { reps: 5 }, { reps: 5 }, { reps: 5 }, { reps: 5 }])
   })
 
-  it('converts a unit on the second number to kg', () => {
-    expect(parseSetLine('3x8lbs')).toEqual([{ reps: 3, weightKg: 3.6 }])
+  it('keeps the weight number when a unit is attached to it', () => {
+    expect(parseSetLine('3x8lbs')).toEqual([{ reps: 3, weightKg: 8 }])
   })
 })
 

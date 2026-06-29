@@ -4,24 +4,20 @@
  * Deliberately small and individually unit-tested.
  */
 
-const LB_TO_KG = 0.45359237
 const MILE_TO_M = 1609.34
 
 const round1 = (n: number) => Math.round(n * 10) / 10
 
-/** Convert a numeric weight to kg, given an optional unit token. No unit means
- *  the number is taken as-is (kg, or a unitless machine-stack value). */
-export function weightToKg(value: number, unit?: string): number {
-  const u = unit?.toLowerCase()
-  const kg = u && (u.startsWith('lb') || u.startsWith('pound')) ? value * LB_TO_KG : value
-  return round1(kg)
-}
-
-/** Weight in kg from "60kg", "60 kg", "135lb", "135 lbs". Returns kg. */
-export function parseWeightKg(text: string): number | undefined {
+/**
+ * The weight number written in "60kg", "60 kg", "135lb", "8lbs". The unit word
+ * is only used to recognise it as a weight — the number is kept as typed, since
+ * the display unit is a single user-wide choice (see settings/weightUnit), not
+ * a per-entry conversion. Machine-stack numbers have no real unit anyway.
+ */
+export function parseWeight(text: string): number | undefined {
   const m = text.match(/(\d+(?:\.\d+)?)\s*(kgs?|kilos?|lbs?|pounds?)\b/i)
   if (!m) return undefined
-  return weightToKg(parseFloat(m[1]), m[2])
+  return round1(parseFloat(m[1]))
 }
 
 /** Distance in metres from "5k", "5km", "800m", "3mi", "3 miles". */

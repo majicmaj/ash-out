@@ -1,5 +1,5 @@
 import type { ExerciseSet } from '@/db/types'
-import { parseWeightKg, weightToKg } from './measures'
+import { parseWeight } from './measures'
 
 /**
  * Parse strength set/rep/weight notation from a clause into one ExerciseSet per
@@ -7,7 +7,7 @@ import { parseWeightKg, weightToKg } from './measures'
  * Returns undefined when there's nothing strength-like to extract.
  */
 export function parseSets(text: string): ExerciseSet[] | undefined {
-  const weightKg = parseWeightKg(text)
+  const weightKg = parseWeight(text)
 
   const grid = text.match(/(\d+)\s*[xX×]\s*(\d+)/)
   if (grid) {
@@ -74,7 +74,7 @@ const PAIR_RE = /(\d+)\s*[xX×]\s*(\d+(?:\.\d+)?)\s*(kgs?|kilos?|lbs?|pounds?)?/
  */
 export function detectNotation(pairs: SetPair[], line: string): SetNotation {
   if (pairs.some((p) => p.unit)) return 'reps_weight'
-  if (parseWeightKg(line) !== undefined) return 'sets_reps'
+  if (parseWeight(line) !== undefined) return 'sets_reps'
   const maxB = Math.max(...pairs.map((p) => p.b))
   const distinct = new Set(pairs.map((p) => p.b)).size
   const descending = pairs.length >= 2 && distinct > 1 && pairs.every((p, i) => i === 0 || p.b <= pairs[i - 1].b)
@@ -100,10 +100,10 @@ export function parseSetLine(line: string): ExerciseSet[] | undefined {
 
   const notation = detectNotation(pairs, line)
   if (notation === 'reps_weight') {
-    return pairs.map((p) => makeSet(p.a, p.unit ? weightToKg(p.b, p.unit) : p.b))
+    return pairs.map((p) => makeSet(p.a, p.b))
   }
 
-  const weightKg = parseWeightKg(line)
+  const weightKg = parseWeight(line)
   return pairs.flatMap((p) =>
     p.a > 0 && p.a <= 50 ? Array.from({ length: p.a }, () => makeSet(p.b, weightKg)) : [makeSet(p.b, weightKg)],
   )

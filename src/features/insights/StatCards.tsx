@@ -1,15 +1,17 @@
 import type { Insights } from './aggregate'
 import { formatDistance, formatDuration } from '@/features/structure/summary'
+import { useWeightUnit } from '@/features/settings/weightUnit'
 
 /** Headline numbers for the selected window. Cards that would read zero (e.g.
  *  no cardio) are simply omitted to keep the grid meaningful. */
 export function StatCards({ insights }: { insights: Insights }) {
+  const unit = useWeightUnit()
   const cards: { label: string; value: string }[] = [
     { label: 'Workout days', value: String(insights.workoutDays) },
     { label: 'Total sets', value: String(insights.totalSets) },
   ]
   if (insights.totalVolumeKg > 0)
-    cards.push({ label: 'Volume', value: `${insights.totalVolumeKg.toLocaleString()} kg` })
+    cards.push({ label: 'Volume', value: `${insights.totalVolumeKg.toLocaleString()} ${unit}` })
   if (insights.totalDistanceM > 0)
     cards.push({ label: 'Distance', value: formatDistance(insights.totalDistanceM) })
   if (insights.totalDurationSec > 0)
