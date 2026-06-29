@@ -67,7 +67,7 @@ export function LogItem({ log }: LogItemProps) {
           </Button>
         </div>
       ) : (
-        <div className="flex shrink-0 items-start gap-0.5 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100">
+        <div className="flex shrink-0 items-start gap-0.5 opacity-100 transition-opacity sm:opacity-0 sm:group-hover:opacity-100 sm:group-focus-within:opacity-100">
           <Button size="sm" variant="ghost" onClick={() => setMode('edit')} aria-label="Edit entry">
             <PencilIcon width={16} height={16} />
           </Button>
