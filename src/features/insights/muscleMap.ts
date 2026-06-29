@@ -1,6 +1,7 @@
 import type { ExtendedBodyPart, Slug } from 'react-muscle-highlighter'
 import type { MuscleGroup } from '@/db/types'
 import { OPTIMAL_WEEKLY_SETS, type MuscleStat } from './aggregate'
+import type { MusclePR } from './records'
 
 /**
  * Bridges our coarse {@link MuscleGroup}s to the anatomical SVG slugs the body
@@ -70,6 +71,22 @@ export function bodyPartsFromMuscles(
     const intensity = intensityFor(stat.sets, weekly, maxSets)
     if (intensity === 0) continue
     for (const slug of MUSCLE_SLUGS[stat.group]) {
+      parts.push({ slug, intensity })
+    }
+  }
+  return parts
+}
+
+/**
+ * Body-map parts for the PR view: a group that matched/beat its PR shows the
+ * top "on target" colour (emerald), others shade by how close the window came
+ * (the same amber ramp), so green reads as "hit my PR again".
+ */
+export function bodyPartsFromPRs(prs: Map<MuscleGroup, MusclePR>): ExtendedBodyPart[] {
+  const parts: ExtendedBodyPart[] = []
+  for (const [group, pr] of prs) {
+    const intensity = pr.hitPR ? 4 : pr.ratio >= 0.9 ? 3 : pr.ratio >= 0.7 ? 2 : 1
+    for (const slug of MUSCLE_SLUGS[group]) {
       parts.push({ slug, intensity })
     }
   }

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useState } from 'react'
 import { Segmented } from '@/components/Segmented'
-import { useInsights, useRecords, WINDOW_LABELS, type TimeWindow } from './hooks'
+import { useInsights, useMusclePRs, useRecords, WINDOW_LABELS, type TimeWindow } from './hooks'
 import { StatCards } from './StatCards'
 import { MuscleLeaderboard, type MuscleMetric } from './MuscleLeaderboard'
 import { PersonalRecords } from './PersonalRecords'
@@ -19,6 +19,7 @@ const WINDOW_OPTIONS = (Object.keys(WINDOW_LABELS) as TimeWindow[]).map((value) 
 const METRIC_OPTIONS: { value: MuscleMetric; label: string }[] = [
   { value: 'count', label: 'Set count' },
   { value: 'target', label: 'vs Target' },
+  { value: 'pr', label: 'PR' },
 ]
 
 /** Step 3 + 4: aggregated insights and the muscle-group leaderboard, derived
@@ -28,6 +29,7 @@ export function InsightsView() {
   const [metric, setMetric] = useState<MuscleMetric>('count')
   const insights = useInsights(window)
   const records = useRecords(window)
+  const musclePRs = useMusclePRs(window)
 
   const hasData =
     insights &&
@@ -59,7 +61,12 @@ export function InsightsView() {
         <>
           <StatCards insights={insights} />
           <Suspense fallback={null}>
-            <MuscleMap muscles={insights.muscles} window={window} />
+            <MuscleMap
+              muscles={insights.muscles}
+              window={window}
+              metric={metric}
+              musclePRs={musclePRs ?? new Map()}
+            />
           </Suspense>
           {insights.muscles.length > 0 && (
             <div className="flex justify-center">

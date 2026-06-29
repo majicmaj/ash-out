@@ -1,4 +1,4 @@
-import type { EventLog } from '@/db/types'
+import type { EventLog, ExerciseSet, MuscleGroup } from '@/db/types'
 
 /**
  * Per-exercise personal records, derived from all structured history. Where the
@@ -106,4 +106,66 @@ export function computeRecords(logs: readonly EventLog[], since: number): Exerci
   // Fresh PRs first, then most recently trained.
   records.sort((a, b) => Number(b.prInWindow) - Number(a.prInWindow) || b.lastAt - a.lastAt)
   return records
+}
+
+/** A single set's strength score (estimated 1RM, Epley) for PR comparison. */
+function setScore(set: ExerciseSet): number {
+  const weight = set.weightKg
+  if (weight === undefined || weight <= 0) return 0
+  const reps = set.reps && set.reps > 0 ? set.reps : 1
+  return weight * (1 + reps / 30)
+}
+
+export interface MusclePR {
+  /** Best strength in window ÷ all-time best (0–1). 1 means a PR was matched. */
+  ratio: number
+  /** The window's best matched or beat the all-time best for the group. */
+  hitPR: boolean
+}
+
+/**
+ * Per-muscle-group PR status for the body map: did this window's training match
+ * the all-time best for any exercise hitting the group? Each exercise's window
+ * best is compared to its all-time best (estimated 1RM), then rolled up to its
+ * muscle groups, taking the group's strongest result.
+ */
+export function computeMusclePRs(
+  logs: readonly EventLog[],
+  since: number,
+): Map<MuscleGroup, MusclePR> {
+  interface Ex {
+    all: number
+    win: number
+    groups: Set<MuscleGroup>
+  }
+  const byExercise = new Map<string, Ex>()
+
+  for (const log of logs) {
+    if (log.status !== 'structured' || !log.structured) continue
+    for (const event of log.structured) {
+      if (event.kind !== 'workout' || !event.sets) continue
+      const score = Math.max(0, ...event.sets.map(setScore))
+      if (score <= 0) continue
+
+      const key = event.exercise.trim().toLowerCase()
+      const ex = byExercise.get(key) ?? { all: 0, win: 0, groups: new Set<MuscleGroup>() }
+      ex.all = Math.max(ex.all, score)
+      if (log.occurredAt >= since) ex.win = Math.max(ex.win, score)
+      for (const g of event.muscleGroups ?? []) if (g !== 'cardio') ex.groups.add(g)
+      byExercise.set(key, ex)
+    }
+  }
+
+  const result = new Map<MuscleGroup, MusclePR>()
+  for (const ex of byExercise.values()) {
+    if (ex.win <= 0) continue // not trained in window
+    const ratio = ex.all > 0 ? ex.win / ex.all : 0
+    for (const group of ex.groups) {
+      const current = result.get(group)
+      if (!current || ratio > current.ratio) {
+        result.set(group, { ratio, hitPR: ratio >= 0.999 })
+      }
+    }
+  }
+  return result
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { EventLog, StructuredEvent } from '@/db/types'
-import { computeRecords } from './records'
+import { computeMusclePRs, computeRecords } from './records'
 
 let counter = 0
 const log = (structured: StructuredEvent[], occurredAt: number): EventLog => ({
@@ -47,6 +47,21 @@ describe('computeRecords', () => {
     const r = computeRecords(logs, between)
     expect(r.at(0)?.bestWeightKg).toBe(100)
     expect(r.at(0)?.prInWindow).toBe(false)
+  })
+
+  it('marks a muscle group green when the window matches the all-time PR', () => {
+    // 100kg PR set earlier and matched again inside the window.
+    const logs = [log([bench(100, 5, 1500)], tEarly), log([bench(100, 5, 1500)], tLate)]
+    const prs = computeMusclePRs(logs, between)
+    expect(prs.get('chest')?.hitPR).toBe(true)
+    expect(prs.get('triceps')).toBeUndefined() // bench here only tags chest
+  })
+
+  it('does not mark green when the window stayed below the PR', () => {
+    const logs = [log([bench(100, 5, 1500)], tEarly), log([bench(80, 5, 1200)], tLate)]
+    const prs = computeMusclePRs(logs, between)
+    expect(prs.get('chest')?.hitPR).toBe(false)
+    expect(prs.get('chest')?.ratio).toBeLessThan(1)
   })
 
   it('ignores bodyweight/cardio entries with no load', () => {

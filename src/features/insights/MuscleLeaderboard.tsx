@@ -1,7 +1,7 @@
 import { cn } from '@/lib/cn'
 import { scaleTarget, targetFor, type MuscleStat } from './aggregate'
 
-export type MuscleMetric = 'count' | 'target'
+export type MuscleMetric = 'count' | 'target' | 'pr'
 
 /**
  * The per-muscle-group breakdown, in one of two views:
@@ -19,7 +19,8 @@ export function MuscleLeaderboard({
   metric: MuscleMetric
   windowDays?: number
 }) {
-  if (muscles.length === 0) return null
+  // PR mode is shown on the body map + records list, not as a per-group bar.
+  if (muscles.length === 0 || metric === 'pr') return null
 
   if (metric === 'target') {
     const targets = new Map(muscles.map((m) => [m.group, scaleTarget(targetFor(m.group), windowDays)]))

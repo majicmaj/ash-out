@@ -2,7 +2,8 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/db'
 import { startOfDay } from '@/lib/date'
 import { computeInsights, filterSince, type Insights } from './aggregate'
-import { computeRecords, type ExerciseRecord } from './records'
+import { computeMusclePRs, computeRecords, type ExerciseRecord, type MusclePR } from './records'
+import type { MuscleGroup } from '@/db/types'
 
 export type TimeWindow = 'day' | 'week' | 'month' | 'all'
 
@@ -39,6 +40,14 @@ export function useRecords(window: TimeWindow): ExerciseRecord[] | undefined {
   return useLiveQuery(async () => {
     const logs = await db.logs.toArray()
     return computeRecords(logs, windowStart(window))
+  }, [window])
+}
+
+/** Live per-muscle-group PR status for the body map. */
+export function useMusclePRs(window: TimeWindow): Map<MuscleGroup, MusclePR> | undefined {
+  return useLiveQuery(async () => {
+    const logs = await db.logs.toArray()
+    return computeMusclePRs(logs, windowStart(window))
   }, [window])
 }
 
