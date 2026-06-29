@@ -1,11 +1,12 @@
 import { cn } from '@/lib/cn'
-import { JournalIcon, ChartIcon } from './icons'
+import { JournalIcon, ChartIcon, TrophyIcon } from './icons'
 
-export type Tab = 'journal' | 'insights'
+export type Tab = 'journal' | 'insights' | 'prs'
 
 const TABS = [
   { value: 'journal' as const, label: 'Journal', Icon: JournalIcon },
   { value: 'insights' as const, label: 'Insights', Icon: ChartIcon },
+  { value: 'prs' as const, label: 'PRs', Icon: TrophyIcon },
 ]
 
 /**

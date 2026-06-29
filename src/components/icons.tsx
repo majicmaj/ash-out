@@ -43,6 +43,25 @@ export const ChartIcon = (p: SVGProps<SVGSVGElement>) => (
   </Icon>
 )
 
+export const TrophyIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Icon {...p}>
+    <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z" />
+    <path d="M7 6H4v2a3 3 0 0 0 3 3M17 6h3v2a3 3 0 0 1-3 3" />
+  </Icon>
+)
+
+export const ChevronLeftIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Icon {...p}>
+    <path d="M15 18l-6-6 6-6" />
+  </Icon>
+)
+
+export const ChevronRightIcon = (p: SVGProps<SVGSVGElement>) => (
+  <Icon {...p}>
+    <path d="M9 18l6-6-6-6" />
+  </Icon>
+)
+
 export const TrashIcon = (p: SVGProps<SVGSVGElement>) => (
   <Icon {...p}>
     <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m2 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" />

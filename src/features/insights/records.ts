@@ -124,14 +124,15 @@ export interface MusclePR {
 }
 
 /**
- * Per-muscle-group PR status for the body map: did this window's training match
- * the all-time best for any exercise hitting the group? Each exercise's window
- * best is compared to its all-time best (estimated 1RM), then rolled up to its
- * muscle groups, taking the group's strongest result.
+ * Per-muscle-group PR status for the body map: did training inside the window
+ * [from, to) match the all-time best for any exercise hitting the group? Each
+ * exercise's in-window best is compared to its all-time best (estimated 1RM),
+ * then rolled up to its muscle groups, taking the group's strongest result.
  */
 export function computeMusclePRs(
   logs: readonly EventLog[],
-  since: number,
+  from: number,
+  to = Infinity,
 ): Map<MuscleGroup, MusclePR> {
   interface Ex {
     all: number
@@ -150,7 +151,7 @@ export function computeMusclePRs(
       const key = event.exercise.trim().toLowerCase()
       const ex = byExercise.get(key) ?? { all: 0, win: 0, groups: new Set<MuscleGroup>() }
       ex.all = Math.max(ex.all, score)
-      if (log.occurredAt >= since) ex.win = Math.max(ex.win, score)
+      if (log.occurredAt >= from && log.occurredAt < to) ex.win = Math.max(ex.win, score)
       for (const g of event.muscleGroups ?? []) if (g !== 'cardio') ex.groups.add(g)
       byExercise.set(key, ex)
     }
@@ -168,4 +169,85 @@ export function computeMusclePRs(
     }
   }
   return result
+}
+
+export interface DayExercise {
+  exercise: string
+  /** Top set of the day (by estimated 1RM). */
+  weightKg: number
+  reps: number
+  /** Best estimated 1RM that day, and the all-time best to compare against. */
+  est1RM: number
+  prEst1RM: number
+  /** The day matched or beat the all-time best for this exercise. */
+  hitPR: boolean
+  volumeKg: number
+}
+
+/**
+ * A single day's lifts compared to all-time PRs, for the PRs tab. For each
+ * exercise trained in [from, to) it reports the day's top set and estimated
+ * 1RM against the exercise's best ever. PRs first, then heaviest.
+ */
+export function computeDayComparison(
+  logs: readonly EventLog[],
+  from: number,
+  to: number,
+): DayExercise[] {
+  const allBest = new Map<string, number>()
+  for (const log of logs) {
+    if (log.status !== 'structured' || !log.structured) continue
+    for (const event of log.structured) {
+      if (event.kind !== 'workout' || !event.sets) continue
+      const score = Math.max(0, ...event.sets.map(setScore))
+      if (score > 0) {
+        const key = event.exercise.trim().toLowerCase()
+        allBest.set(key, Math.max(allBest.get(key) ?? 0, score))
+      }
+    }
+  }
+
+  interface Day {
+    display: string
+    weightKg: number
+    reps: number
+    est1RM: number
+    volumeKg: number
+  }
+  const day = new Map<string, Day>()
+  for (const log of logs) {
+    if (log.status !== 'structured' || !log.structured) continue
+    if (log.occurredAt < from || log.occurredAt >= to) continue
+    for (const event of log.structured) {
+      if (event.kind !== 'workout' || !event.sets) continue
+      const key = event.exercise.trim().toLowerCase()
+      const d = day.get(key) ?? { display: event.exercise.trim(), weightKg: 0, reps: 0, est1RM: 0, volumeKg: 0 }
+      for (const set of event.sets) {
+        const score = setScore(set)
+        if (score > d.est1RM) {
+          d.est1RM = score
+          d.weightKg = set.weightKg ?? 0
+          d.reps = set.reps ?? 0
+        }
+      }
+      d.volumeKg += event.estimatedVolumeKg ?? 0
+      if (d.est1RM > 0) day.set(key, d)
+    }
+  }
+
+  const out: DayExercise[] = []
+  for (const [key, d] of day) {
+    const pr = allBest.get(key) ?? d.est1RM
+    out.push({
+      exercise: d.display,
+      weightKg: d.weightKg,
+      reps: d.reps,
+      est1RM: Math.round(d.est1RM),
+      prEst1RM: Math.round(pr),
+      hitPR: d.est1RM >= pr * 0.999,
+      volumeKg: Math.round(d.volumeKg),
+    })
+  }
+  out.sort((a, b) => Number(b.hitPR) - Number(a.hitPR) || b.est1RM - a.est1RM)
+  return out
 }

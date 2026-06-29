@@ -5,6 +5,7 @@ import { LogComposer } from '@/features/logs/LogComposer'
 import { LogList } from '@/features/logs/LogList'
 import { SettingsSheet } from '@/features/data/SettingsSheet'
 import { InsightsView } from '@/features/insights/InsightsView'
+import { PRView } from '@/features/insights/PRView'
 import { useAutoStructure } from '@/features/structure/useAutoStructure'
 import { useStructurer } from '@/features/structure/structurerContext'
 
@@ -30,8 +31,10 @@ export function App() {
               <LogList />
             </div>
           </>
-        ) : (
+        ) : tab === 'insights' ? (
           <InsightsView />
+        ) : (
+          <PRView />
         )}
       </main>
 

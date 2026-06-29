@@ -36,13 +36,15 @@ export function MuscleMap({
   muscles: MuscleStat[]
   window: TimeWindow
   metric: MuscleMetric
-  musclePRs: Map<MuscleGroup, MusclePR>
+  musclePRs?: Map<MuscleGroup, MusclePR>
 }) {
   const [side, setSide] = useState<Side>('front')
   const [gender, setGender] = useState<Gender>('male')
 
   const prMode = metric === 'pr'
-  const data = prMode ? bodyPartsFromPRs(musclePRs) : bodyPartsFromMuscles(muscles, window === 'week')
+  const data = prMode
+    ? bodyPartsFromPRs(musclePRs ?? new Map())
+    : bodyPartsFromMuscles(muscles, window === 'week')
   if (data.length === 0) return null
 
   return (

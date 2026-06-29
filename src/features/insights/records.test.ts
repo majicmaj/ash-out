@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { EventLog, StructuredEvent } from '@/db/types'
-import { computeMusclePRs, computeRecords } from './records'
+import { computeDayComparison, computeMusclePRs, computeRecords } from './records'
 
 let counter = 0
 const log = (structured: StructuredEvent[], occurredAt: number): EventLog => ({
@@ -62,6 +62,18 @@ describe('computeRecords', () => {
     const prs = computeMusclePRs(logs, between)
     expect(prs.get('chest')?.hitPR).toBe(false)
     expect(prs.get('chest')?.ratio).toBeLessThan(1)
+  })
+
+  it('compares a single day against all-time PRs', () => {
+    const DAY = 86_400_000
+    const logs = [log([bench(100, 5, 1500)], tEarly), log([bench(80, 5, 1200)], tLate)]
+    // The tLate day was weaker than the all-time best from tEarly.
+    const weak = computeDayComparison(logs, tLate, tLate + DAY)
+    expect(weak).toHaveLength(1)
+    expect(weak[0]).toMatchObject({ exercise: 'Bench Press', weightKg: 80, reps: 5, hitPR: false })
+    expect(weak[0].prEst1RM).toBeGreaterThan(weak[0].est1RM)
+    // The tEarly day set the record.
+    expect(computeDayComparison(logs, tEarly, tEarly + DAY)[0].hitPR).toBe(true)
   })
 
   it('ignores bodyweight/cardio entries with no load', () => {
